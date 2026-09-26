@@ -1,372 +1,231 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Life OS</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300..700;1,300..700&family=DM+Sans:wght@400..700&display=swap">
 <style>
-*{box-sizing:border-box}
-html,body{margin:0;height:100%;background:#0B0C11;overflow:hidden;font-family:'DM Sans',Arial,sans-serif}
-#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:center center}
-#stage>section{position:absolute;inset:0;width:1920px;height:1080px;overflow:hidden;opacity:0;pointer-events:none;transition:opacity .35s ease}
-#stage>section.on{opacity:1;pointer-events:auto}
-h1,h2,h3,p,ol,ul{margin:0}
-h1{font-size:96px;font-weight:600;line-height:1.1}h2{font-size:64px;font-weight:600;line-height:1.15}h3{font-size:44px;font-weight:600;line-height:1.2}p{font-size:32px;line-height:1.4}
-ol{padding-left:1.3em}
-#bar{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;align-items:center;gap:16px;padding:10px;font:14px 'DM Sans',Arial,sans-serif;color:#B9BCC8;opacity:.35;transition:opacity .2s}
-#bar:hover{opacity:1}
-#bar button{background:#1C1E29;color:#F5F1E8;border:1px solid #333645;border-radius:8px;padding:6px 14px;font:inherit;cursor:pointer}
-@media print{html,body{overflow:visible;height:auto;background:none}#bar{display:none}#stage{position:static;transform:none!important}#stage>section{position:relative;opacity:1;page-break-after:always}@page{size:1920px 1080px;margin:0}}
-</style></head><body>
+  :root {
+    --ink: #13141C; --ink-2: #1C1E29; --line: #333645;
+    --paper: #F5F1E8; --muted: #B9BCC8;
+    --gold: #E3B04B; --gold-deep: #3A2E12;
+    --body: #2E7D6F; --body-soft: #DCEBE7;
+    --mind: #5B7BD6; --mind-soft: #DDE4F4;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #0B0C11; overflow: hidden; font-family: 'DM Sans', Arial, sans-serif; }
+  h1, h2, h3, p { margin: 0; }
+  .serif { font-family: 'Fraunces', Georgia, serif; }
+
+  #stage { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px; }
+  .slide { position: absolute; inset: 0; overflow: hidden; background: var(--ink); color: var(--paper);
+           opacity: 0; pointer-events: none; transition: opacity .4s ease; }
+  .slide.on { opacity: 1; pointer-events: auto; }
+  .abs { position: absolute; }
+
+  /* Waterfall build: each level drops in after the one above it */
+  .lv { opacity: 0; transform: translateY(-24px); }
+  .slide.on .lv { animation: drop .6s cubic-bezier(.2,.8,.2,1) forwards; }
+  .slide.on .lv1 { animation-delay: .15s; }
+  .slide.on .lv2 { animation-delay: .7s; }
+  .slide.on .lv3 { animation-delay: 1.25s; }
+  .slide.on .lv4 { animation-delay: 1.8s; }
+  @keyframes drop { to { opacity: 1; transform: none; } }
+  .wire { stroke-dasharray: 1200; stroke-dashoffset: 1200; }
+  .slide.on .wire { animation: draw .7s ease forwards; }
+  .slide.on .wire.w2 { animation-delay: .5s; }
+  .slide.on .wire.w3 { animation-delay: 1.05s; }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+
+  .core { border-radius: 50%; background: var(--gold); color: var(--ink); display: flex; align-items: center;
+          justify-content: center; text-align: center; box-shadow: 0 0 0 10px rgba(227,176,75,.15), 0 0 80px rgba(227,176,75,.35); }
+  .pill { border-radius: 999px; display: flex; align-items: center; justify-content: center; text-align: center;
+          font-family: 'Fraunces', Georgia, serif; font-size: 40px; color: var(--paper); }
+  .bubble { border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; padding: 20px; font-size: 26px; line-height: 1.25; }
+  .card { border-radius: 28px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+          text-align: center; gap: 10px; padding: 32px 24px; }
+  .num { font-family: 'Fraunces', Georgia, serif; font-size: 88px; line-height: 1; }
+  .lbl { font-size: 28px; line-height: 1.3; }
+  .eyebrow { font-size: 24px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; }
+  .tag { font-size: 22px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; opacity: .85; }
+
+  #bar { position: fixed; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; align-items: center;
+         gap: 14px; padding: 10px; font: 14px 'DM Sans', Arial, sans-serif; color: var(--muted); opacity: .35; transition: opacity .2s; }
+  #bar:hover { opacity: 1; }
+  #bar button { background: var(--ink-2); color: var(--paper); border: 1px solid var(--line); border-radius: 8px;
+                padding: 6px 14px; font: inherit; cursor: pointer; }
+  @media print {
+    html, body { overflow: visible; height: auto; background: none; }
+    #bar { display: none; }
+    #stage { position: static; transform: none !important; }
+    .slide { position: relative; width: 1920px; height: 1080px; opacity: 1; page-break-after: always; }
+    .lv { opacity: 1; transform: none; } .wire { stroke-dashoffset: 0; }
+    @page { size: 1920px 1080px; margin: 0; }
+  }
+</style>
+</head>
+<body>
 <div id="stage">
-<section id="cover" data-transition="fade" style="background:#13141C; color:#F5F1E8; font-family:'DM Sans', Arial, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:center; gap:32px">
-<svg aria-label="Concentric rings: a gold core, three colored domain arcs, and an outer ring of 84 dots" style="position:absolute; left:1136px; top:228px; width:624px; height:624px" width="624" height="624" viewBox="0 0 624 624">
-<circle cx="312" cy="312" r="290" fill="none" stroke="#E3B04B" stroke-width="10" stroke-linecap="round" stroke-dasharray="0 21.69" opacity="0.7"/>
-<circle cx="312" cy="312" r="185" fill="none" stroke="#2E7D6F" stroke-width="70" stroke-dasharray="375 787.4" transform="rotate(-148 312 312)"/>
-<circle cx="312" cy="312" r="185" fill="none" stroke="#3B5BA9" stroke-width="70" stroke-dasharray="375 787.4" transform="rotate(-28 312 312)"/>
-<circle cx="312" cy="312" r="185" fill="none" stroke="#B8563D" stroke-width="70" stroke-dasharray="375 787.4" transform="rotate(92 312 312)"/>
-<circle cx="312" cy="312" r="110" fill="#E3B04B"/>
-</svg>
-<p style="font-size:24px; font-weight:700; letter-spacing:4px; text-transform:uppercase; color:#E3B04B; width:900px">A personal operating system</p>
-<h1 style="font-family:'Fraunces', Georgia, serif; font-size:160px; font-weight:400; line-height:1; width:900px">Life OS</h1>
-<p style="font-family:'Fraunces', Georgia, serif; font-style:italic; font-size:44px; line-height:1.3; color:#F5F1E8; width:900px">Identity → Objectives → Actions</p>
-<p style="font-size:28px; line-height:1.5; color:#B9BCC8; width:860px">Built on two books: <i>Atomic Habits</i> by James Clear, and <i>The 4 Disciplines of Execution</i> by McChesney, Covey and Huling.</p>
 
-</section>
+  <!-- 1 · Title -->
+  <section class="slide">
+    <p class="abs eyebrow" style="left:0; right:0; top:250px; text-align:center; color:var(--gold)">Life OS</p>
+    <div class="abs core lv lv1" style="left:760px; top:330px; width:400px; height:400px">
+      <p class="serif" style="font-size:64px; font-style:italic; line-height:1.1">I am<br>phenomenal.</p>
+    </div>
+    <p class="abs lv lv2" style="left:0; right:0; top:800px; text-align:center; font-size:32px; color:var(--muted)">Everything I do flows from this one sentence.</p>
+  </section>
 
-<section id="sources" data-transition="fade" style="background:#F5F1E8; color:#13141C; font-family:'DM Sans', Arial, sans-serif; padding:128px; display:flex; flex-direction:column; gap:56px">
-<h2 style="font-family:'Fraunces', Georgia, serif; font-size:72px; font-weight:400; line-height:1.1">Two books, two jobs</h2>
-<div style="display:flex; gap:40px; flex:1">
-<div style="flex:1; display:flex; flex-direction:column; gap:24px; background:#FBF9F4; padding:56px; border:1px solid #E2DCCD; border-radius:24px">
-<p style="font-size:24px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:#8A6516">Atomic Habits · James Clear</p>
-<h3 style="font-family:'Fraunces', Georgia, serif; font-size:44px; font-weight:500; line-height:1.2">Who I become</h3>
-<p style="font-size:30px; line-height:1.45; color:#4A4D5A">Lasting change starts with identity, not outcomes. Habits are how an identity gets proven, one repetition at a time.</p>
-<div style="flex:1"></div>
-<p style="font-family:'Fraunces', Georgia, serif; font-style:italic; font-size:32px; line-height:1.35; color:#13141C; border-left:4px solid #E3B04B; padding:0 0 0 24px">“Every action you take is a vote for the type of person you wish to become.”</p>
-<p style="font-size:24px; font-weight:700; color:#2E7D6F">Gives the OS: the identity core and the daily habits</p>
-</div>
-<div style="flex:1; display:flex; flex-direction:column; gap:24px; background:#FBF9F4; padding:56px; border:1px solid #E2DCCD; border-radius:24px">
-<p style="font-size:24px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:#8A6516">The 4 Disciplines of Execution</p>
-<h3 style="font-family:'Fraunces', Georgia, serif; font-size:44px; font-weight:500; line-height:1.2">What I finish</h3>
-<p style="font-size:30px; line-height:1.45; color:#4A4D5A">Strategy fails in the “whirlwind” of everyday urgency. Narrow to a Wildly Important Goal, drive it with lead measures, and track it every week.</p>
-<div style="flex:1"></div>
-<p style="font-family:'Fraunces', Georgia, serif; font-style:italic; font-size:32px; line-height:1.35; color:#13141C; border-left:4px solid #E3B04B; padding:0 0 0 24px">Focus → Leverage → Engagement → Accountability</p>
-<p style="font-size:24px; font-weight:700; color:#2E7D6F">Gives the OS: focus, a scoreboard and a weekly rhythm</p>
-</div>
-</div>
+  <!-- 2 · The whole waterfall -->
+  <section class="slide">
+    <svg class="abs" style="left:0; top:0" width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" stroke-width="4" stroke-linecap="round">
+      <path class="wire" stroke="var(--gold)" d="M960 300 C960 380 520 360 520 440"/>
+      <path class="wire" stroke="var(--gold)" d="M960 300 C960 380 1400 360 1400 440"/>
+      <g stroke="var(--body)">
+        <path class="wire w2" d="M520 560 C520 640 214 640 214 720"/>
+        <path class="wire w2" d="M520 560 C520 640 418 640 418 720"/>
+        <path class="wire w2" d="M520 560 C520 640 622 640 622 720"/>
+        <path class="wire w2" d="M520 560 C520 640 826 640 826 720"/>
+      </g>
+      <g stroke="var(--mind)">
+        <path class="wire w2" d="M1400 560 C1400 640 1160 640 1160 720"/>
+        <path class="wire w2" d="M1400 560 L1400 720"/>
+        <path class="wire w2" d="M1400 560 C1400 640 1640 640 1640 720"/>
+      </g>
+    </svg>
 
-</section>
+    <div class="abs core lv lv1" style="left:850px; top:80px; width:220px; height:220px">
+      <p class="serif" style="font-size:36px; font-style:italic; line-height:1.1">I am<br>phenomenal.</p>
+    </div>
 
-<section id="inside-out" data-transition="fade" style="background:#EBE5D8; color:#13141C; font-family:'DM Sans', Arial, sans-serif; padding:128px; display:flex; flex-direction:column; gap:56px">
-<h2 style="font-family:'Fraunces', Georgia, serif; font-size:72px; font-weight:400; line-height:1.1">Plan from the inside out</h2>
-<div style="display:flex; align-items:center; gap:24px">
-<div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#13141C; color:#F5F1E8; padding:48px; border-radius:24px">
-<p style="font-size:24px; font-weight:700; letter-spacing:3px; color:#E3B04B">1 · IDENTITY</p>
-<h3 style="font-family:'Fraunces', Georgia, serif; font-size:72px; font-weight:400; line-height:1.1; color:#F5F1E8">Be</h3>
-<p style="font-size:28px; line-height:1.45; color:#B9BCC8">Who I am. One sentence, read every morning.</p>
-</div>
-<svg width="64" height="32" viewBox="0 0 64 32" style="flex:none"><path d="M0 10h38V0l26 16-26 16V22H0z" fill="#8A6516"/></svg>
-<div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#FBF9F4; padding:48px; border:1px solid #D6CEBC; border-radius:24px">
-<p style="font-size:24px; font-weight:700; letter-spacing:3px; color:#8A6516">2 · OBJECTIVES</p>
-<h3 style="font-family:'Fraunces', Georgia, serif; font-size:72px; font-weight:400; line-height:1.1">Aim</h3>
-<p style="font-size:28px; line-height:1.45; color:#4A4D5A">What I will achieve in 12 weeks, across health, work and relationships.</p>
-</div>
-<svg width="64" height="32" viewBox="0 0 64 32" style="flex:none"><path d="M0 10h38V0l26 16-26 16V22H0z" fill="#8A6516"/></svg>
-<div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#FBF9F4; padding:48px; border:1px solid #D6CEBC; border-radius:24px">
-<p style="font-size:24px; font-weight:700; letter-spacing:3px; color:#8A6516">3 · ACTIONS</p>
-<h3 style="font-family:'Fraunces', Georgia, serif; font-size:72px; font-weight:400; line-height:1.1">Do</h3>
-<p style="font-size:28px; line-height:1.45; color:#4A4D5A">What I do today. Small, repeatable, and easy to count.</p>
-</div>
-</div>
-<div style="flex:1"></div>
-<p style="font-size:28px; line-height:1.5; color:#4A4D5A; width:1400px">Clear describes three layers of change: <b>outcomes</b>, <b>processes</b> and <b>identity</b>. Most people start with the outcome. This system starts at the core and works outward.</p>
+    <div class="abs pill lv lv2" style="left:270px; top:440px; width:500px; height:120px; background:var(--body)">I have an extraordinary body.</div>
+    <div class="abs pill lv lv2" style="left:1150px; top:440px; width:500px; height:120px; background:var(--mind)">I have Buddha’s mindset.</div>
 
-</section>
+    <div class="abs bubble lv lv3" style="left:124px; top:720px; width:180px; height:180px; background:var(--body-soft); color:var(--ink)"><b style="font-size:34px">3×</b>workouts a week</div>
+    <div class="abs bubble lv lv3" style="left:328px; top:720px; width:180px; height:180px; background:var(--body-soft); color:var(--ink)"><b style="font-size:34px">2,500</b>calories a day</div>
+    <div class="abs bubble lv lv3" style="left:532px; top:720px; width:180px; height:180px; background:var(--body-soft); color:var(--ink)"><b style="font-size:34px">150 g</b>protein a day</div>
+    <div class="abs bubble lv lv3" style="left:736px; top:720px; width:180px; height:180px; background:var(--body-soft); color:var(--ink)"><b style="font-size:34px">&lt;15 g</b>saturated fat</div>
 
-<section id="system" data-transition="fade" style="background:#13141C; color:#F5F1E8; font-family:'DM Sans', Arial, sans-serif; padding:128px; display:flex; flex-direction:column">
-<svg aria-label="Concentric diagram: identity core, surrounded by Health, Work and Relationships, each split into three objectives, with an outer ring of 84 daily dots" style="position:absolute; left:120px; top:100px; width:880px; height:880px" width="880" height="880" viewBox="0 0 880 880">
-<g fill="#E3B04B" opacity="0.55"><circle cx="440.0" cy="30.0" r="6"/><circle cx="470.6" cy="31.1" r="6"/><circle cx="501.1" cy="34.6" r="6"/><circle cx="531.2" cy="40.3" r="6"/><circle cx="560.8" cy="48.2" r="6"/><circle cx="589.8" cy="58.3" r="6"/><circle cx="617.9" cy="70.6" r="6"/><circle cx="645.0" cy="84.9" r="6"/><circle cx="671.0" cy="101.2" r="6"/><circle cx="695.6" cy="119.4" r="6"/><circle cx="718.9" cy="139.4" r="6"/><circle cx="740.6" cy="161.1" r="6"/><circle cx="760.6" cy="184.4" r="6"/><circle cx="778.8" cy="209.0" r="6"/><circle cx="795.1" cy="235.0" r="6"/><circle cx="809.4" cy="262.1" r="6"/><circle cx="821.7" cy="290.2" r="6"/><circle cx="831.8" cy="319.2" r="6"/><circle cx="839.7" cy="348.8" r="6"/><circle cx="845.4" cy="378.9" r="6"/><circle cx="848.9" cy="409.4" r="6"/><circle cx="850.0" cy="440.0" r="6"/><circle cx="848.9" cy="470.6" r="6"/><circle cx="845.4" cy="501.1" r="6"/><circle cx="839.7" cy="531.2" r="6"/><circle cx="831.8" cy="560.8" r="6"/><circle cx="821.7" cy="589.8" r="6"/><circle cx="809.4" cy="617.9" r="6"/><circle cx="795.1" cy="645.0" r="6"/><circle cx="778.8" cy="671.0" r="6"/><circle cx="760.6" cy="695.6" r="6"/><circle cx="740.6" cy="718.9" r="6"/><circle cx="718.9" cy="740.6" r="6"/><circle cx="695.6" cy="760.6" r="6"/><circle cx="671.0" cy="778.8" r="6"/><circle cx="645.0" cy="795.1" r="6"/><circle cx="617.9" cy="809.4" r="6"/><circle cx="589.8" cy="821.7" r="6"/><circle cx="560.8" cy="831.8" r="6"/><circle cx="531.2" cy="839.7" r="6"/><circle cx="501.1" cy="845.4" r="6"/><circle cx="470.6" cy="848.9" r="6"/><circle cx="440.0" cy="850.0" r="6"/><circle cx="409.4" cy="848.9" r="6"/><circle cx="378.9" cy="845.4" r="6"/><circle cx="348.8" cy="839.7" r="6"/><circle cx="319.2" cy="831.8" r="6"/><circle cx="290.2" cy="821.7" r="6"/><circle cx="262.1" cy="809.4" r="6"/><circle cx="235.0" cy="795.1" r="6"/><circle cx="209.0" cy="778.8" r="6"/><circle cx="184.4" cy="760.6" r="6"/><circle cx="161.1" cy="740.6" r="6"/><circle cx="139.4" cy="718.9" r="6"/><circle cx="119.4" cy="695.6" r="6"/><circle cx="101.2" cy="671.0" r="6"/><circle cx="84.9" cy="645.0" r="6"/><circle cx="70.6" cy="617.9" r="6"/><circle cx="58.3" cy="589.8" r="6"/><circle cx="48.2" cy="560.8" r="6"/><circle cx="40.3" cy="531.2" r="6"/><circle cx="34.6" cy="501.1" r="6"/><circle cx="31.1" cy="470.6" r="6"/><circle cx="30.0" cy="440.0" r="6"/><circle cx="31.1" cy="409.4" r="6"/><circle cx="34.6" cy="378.9" r="6"/><circle cx="40.3" cy="348.8" r="6"/><circle cx="48.2" cy="319.2" r="6"/><circle cx="58.3" cy="290.2" r="6"/><circle cx="70.6" cy="262.1" r="6"/><circle cx="84.9" cy="235.0" r="6"/><circle cx="101.2" cy="209.0" r="6"/><circle cx="119.4" cy="184.4" r="6"/><circle cx="139.4" cy="161.1" r="6"/><circle cx="161.1" cy="139.4" r="6"/><circle cx="184.4" cy="119.4" r="6"/><circle cx="209.0" cy="101.2" r="6"/><circle cx="235.0" cy="84.9" r="6"/><circle cx="262.1" cy="70.6" r="6"/><circle cx="290.2" cy="58.3" r="6"/><circle cx="319.2" cy="48.2" r="6"/><circle cx="348.8" cy="40.3" r="6"/><circle cx="378.9" cy="34.6" r="6"/><circle cx="409.4" cy="31.1" r="6"/></g>
-<path fill="#1F4F47" d="M110.9 630.0A380 380 0 0 1 65.8 374.0L174.1 393.1A270 270 0 0 0 206.2 575.0Z"/>
-<path fill="#1F4F47" d="M65.8 374.0A380 380 0 0 1 195.7 148.9L266.4 233.2A270 270 0 0 0 174.1 393.1Z"/>
-<path fill="#1F4F47" d="M195.7 148.9A380 380 0 0 1 440.0 60.0L440.0 170.0A270 270 0 0 0 266.4 233.2Z"/>
-<path fill="#26386A" d="M440.0 60.0A380 380 0 0 1 684.3 148.9L613.6 233.2A270 270 0 0 0 440.0 170.0Z"/>
-<path fill="#26386A" d="M684.3 148.9A380 380 0 0 1 814.2 374.0L705.9 393.1A270 270 0 0 0 613.6 233.2Z"/>
-<path fill="#26386A" d="M814.2 374.0A380 380 0 0 1 769.1 630.0L673.8 575.0A270 270 0 0 0 705.9 393.1Z"/>
-<path fill="#6E3526" d="M769.1 630.0A380 380 0 0 1 570.0 797.1L532.3 693.7A270 270 0 0 0 673.8 575.0Z"/>
-<path fill="#6E3526" d="M570.0 797.1A380 380 0 0 1 310.0 797.1L347.7 693.7A270 270 0 0 0 532.3 693.7Z"/>
-<path fill="#6E3526" d="M310.0 797.1A380 380 0 0 1 110.9 630.0L206.2 575.0A270 270 0 0 0 347.7 693.7Z"/>
-<path fill="#2E7D6F" d="M206.2 575.0A270 270 0 0 1 440.0 170.0L440.0 300.0A140 140 0 0 0 318.8 510.0Z"/>
-<path fill="#3B5BA9" d="M440.0 170.0A270 270 0 0 1 673.8 575.0L561.2 510.0A140 140 0 0 0 440.0 300.0Z"/>
-<path fill="#B8563D" d="M673.8 575.0A270 270 0 0 1 206.2 575.0L318.8 510.0A140 140 0 0 0 561.2 510.0Z"/>
-<g stroke="#13141C" stroke-width="3"><line x1="174.1" y1="393.1" x2="65.8" y2="374.0"/><line x1="266.4" y1="233.2" x2="195.7" y2="148.9"/><line x1="613.6" y1="233.2" x2="684.3" y2="148.9"/><line x1="705.9" y1="393.1" x2="814.2" y2="374.0"/><line x1="532.3" y1="693.7" x2="570.0" y2="797.1"/><line x1="347.7" y1="693.7" x2="310.0" y2="797.1"/></g>
-<g stroke="#13141C" stroke-width="8"><line x1="318.8" y1="510.0" x2="110.9" y2="630.0"/><line x1="440.0" y1="300.0" x2="440.0" y2="60.0"/><line x1="561.2" y1="510.0" x2="769.1" y2="630.0"/></g>
-<circle cx="440" cy="440" r="270" fill="none" stroke="#13141C" stroke-width="4"/>
-<circle cx="440" cy="440" r="140" fill="#E3B04B" stroke="#13141C" stroke-width="6"/>
-</svg>
-<div style="position:absolute; left:420px; top:450px; width:280px; height:180px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px">
-<p style="font-size:24px; font-weight:700; letter-spacing:3px; color:#13141C; text-align:center">IDENTITY</p>
-<p style="font-family:'Fraunces', Georgia, serif; font-style:italic; font-size:36px; line-height:1.15; color:#13141C; text-align:center">I am<br>phenomenal.</p>
-</div>
-<p style="position:absolute; left:262px; top:419px; width:240px; font-size:28px; font-weight:700; text-align:center; color:#F5F1E8">Health</p>
-<p style="position:absolute; left:617px; top:419px; width:240px; font-size:28px; font-weight:700; text-align:center; color:#F5F1E8">Work</p>
-<p style="position:absolute; left:440px; top:727px; width:240px; font-size:28px; font-weight:700; text-align:center; color:#F5F1E8">Relationships</p>
-<p style="position:absolute; left:175px; top:580px; width:130px; font-size:24px; text-align:center; color:#DCEBE7">Mind</p>
-<p style="position:absolute; left:214px; top:362px; width:130px; font-size:24px; text-align:center; color:#DCEBE7">Body</p>
-<p style="position:absolute; left:384px; top:219px; width:130px; font-size:24px; text-align:center; color:#DCEBE7">Spirit</p>
-<p style="position:absolute; left:606px; top:219px; width:130px; font-size:24px; text-align:center; color:#DDE4F4">Wealth</p>
-<p style="position:absolute; left:776px; top:362px; width:130px; font-size:24px; text-align:center; color:#DDE4F4">Impact</p>
-<p style="position:absolute; left:815px; top:580px; width:130px; font-size:24px; text-align:center; color:#DDE4F4">Growth</p>
-<p style="position:absolute; left:704px; top:773px; width:130px; font-size:24px; text-align:center; color:#F4E0D9">Family</p>
-<p style="position:absolute; left:495px; top:849px; width:130px; font-size:24px; text-align:center; color:#F4E0D9">Romance</p>
-<p style="position:absolute; left:286px; top:773px; width:130px; font-size:24px; text-align:center; color:#F4E0D9">Social</p>
-<div style="position:absolute; left:1080px; top:128px; width:712px; display:flex; flex-direction:column; gap:40px">
-<h2 style="font-family:'Fraunces', Georgia, serif; font-size:72px; font-weight:400; line-height:1.1; color:#F5F1E8">Everything radiates from one sentence</h2>
-<div style="display:flex; gap:24px; align-items:start">
-<div style="width:32px; height:32px; background:#E3B04B; border-radius:50%"></div>
-<div style="flex:1; display:flex; flex-direction:column; gap:8px">
-<h3 style="font-size:32px; font-weight:700; color:#F5F1E8">Identity · the core</h3>
-<p style="font-size:26px; line-height:1.45; color:#B9BCC8">Who I am. Every choice is a vote for it.</p>
-</div>
-</div>
-<div style="display:flex; gap:24px; align-items:start">
-<div style="width:32px; height:32px; background:linear-gradient(90deg, #2E7D6F 0%, #2E7D6F 33%, #3B5BA9 33%, #3B5BA9 66%, #B8563D 66%, #B8563D 100%); border-radius:50%"></div>
-<div style="flex:1; display:flex; flex-direction:column; gap:8px">
-<h3 style="font-size:32px; font-weight:700; color:#F5F1E8">Objectives · the middle ring</h3>
-<p style="font-size:26px; line-height:1.45; color:#B9BCC8">Three domains, three objectives each: nine in all. Each domain gets one WIG.</p>
-</div>
-</div>
-<div style="display:flex; gap:24px; align-items:start">
-<div style="width:32px; height:32px; border:3px dotted #E3B04B; border-radius:50%"></div>
-<div style="flex:1; display:flex; flex-direction:column; gap:8px">
-<h3 style="font-size:32px; font-weight:700; color:#F5F1E8">Actions · the outer rim</h3>
-<p style="font-size:26px; line-height:1.45; color:#B9BCC8">84 dots for the 84 days of a 12-week cycle. Each one is a daily vote.</p>
-</div>
-</div>
-</div>
+    <div class="abs bubble lv lv3" style="left:1070px; top:720px; width:180px; height:180px; background:var(--mind-soft); color:var(--ink)"><b style="font-size:34px">10 min</b>meditation</div>
+    <div class="abs bubble lv lv3" style="left:1310px; top:720px; width:180px; height:180px; background:var(--mind-soft); color:var(--ink)"><b style="font-size:34px">Pause</b>before reacting</div>
+    <div class="abs bubble lv lv3" style="left:1550px; top:720px; width:180px; height:180px; background:var(--mind-soft); color:var(--ink)"><b style="font-size:34px">3</b>gratitudes at night</div>
+  </section>
 
-</section>
+  <!-- 3 · Body branch -->
+  <section class="slide">
+    <svg class="abs" style="left:0; top:0" width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" stroke-width="4" stroke-linecap="round">
+      <path class="wire" stroke="var(--gold)" d="M960 290 L960 390"/>
+      <path class="wire w2" stroke="var(--body)" d="M960 510 C960 580 402 570 402 640"/>
+      <path class="wire w2" stroke="var(--body)" d="M960 510 C960 580 774 570 774 640"/>
+      <path class="wire w2" stroke="var(--body)" d="M960 510 C960 580 1146 570 1146 640"/>
+      <path class="wire w2" stroke="var(--body)" d="M960 510 C960 580 1518 570 1518 640"/>
+    </svg>
+    <div class="abs core lv lv1" style="left:860px; top:90px; width:200px; height:200px">
+      <p class="serif" style="font-size:32px; font-style:italic; line-height:1.1">I am<br>phenomenal.</p>
+    </div>
+    <div class="abs pill lv lv2" style="left:600px; top:390px; width:720px; height:120px; background:var(--body); font-size:48px">I have an extraordinary body.</div>
 
-<section id="identity" data-transition="fade" style="background:#E3B04B; color:#13141C; font-family:'DM Sans', Arial, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:center; gap:40px">
-<p style="font-size:24px; font-weight:700; letter-spacing:4px; color:#13141C">THE CORE · IDENTITY</p>
-<h1 style="font-family:'Fraunces', Georgia, serif; font-size:96px; font-weight:400; line-height:1.15; color:#13141C">I do phenomenal things.<br>I live a phenomenal life.<br><i>I am phenomenal.</i></h1>
-<p style="font-size:32px; line-height:1.45; color:#3A2E12; width:1200px">Doing, living, being. Every goal and every habit below has to be something a phenomenal person would do.</p>
+    <div class="abs card lv lv3" style="left:232px; top:640px; width:340px; height:280px; background:var(--body-soft); color:var(--ink)">
+      <p class="tag" style="color:var(--body)">Train</p><p class="num">3×</p><p class="lbl">workouts every week</p>
+    </div>
+    <div class="abs card lv lv3" style="left:604px; top:640px; width:340px; height:280px; background:var(--body-soft); color:var(--ink)">
+      <p class="tag" style="color:var(--body)">Fuel</p><p class="num">2,500</p><p class="lbl">calories a day</p>
+    </div>
+    <div class="abs card lv lv3" style="left:976px; top:640px; width:340px; height:280px; background:var(--body-soft); color:var(--ink)">
+      <p class="tag" style="color:var(--body)">Build</p><p class="num">150 g</p><p class="lbl">protein a day</p>
+    </div>
+    <div class="abs card lv lv3" style="left:1348px; top:640px; width:340px; height:280px; background:var(--body-soft); color:var(--ink)">
+      <p class="tag" style="color:var(--body)">Protect</p><p class="num">&lt;15 g</p><p class="lbl">saturated fat a day</p>
+    </div>
+  </section>
 
-</section>
+  <!-- 4 · Mind branch -->
+  <section class="slide">
+    <svg class="abs" style="left:0; top:0" width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" stroke-width="4" stroke-linecap="round">
+      <path class="wire" stroke="var(--gold)" d="M960 290 L960 390"/>
+      <path class="wire w2" stroke="var(--mind)" d="M960 510 C960 580 512 570 512 640"/>
+      <path class="wire w2" stroke="var(--mind)" d="M960 510 L960 640"/>
+      <path class="wire w2" stroke="var(--mind)" d="M960 510 C960 580 1408 570 1408 640"/>
+    </svg>
+    <div class="abs core lv lv1" style="left:860px; top:90px; width:200px; height:200px">
+      <p class="serif" style="font-size:32px; font-style:italic; line-height:1.1">I am<br>phenomenal.</p>
+    </div>
+    <div class="abs pill lv lv2" style="left:600px; top:390px; width:720px; height:120px; background:var(--mind); font-size:48px">I have Buddha’s mindset.</div>
 
-<section id="domains" data-transition="fade" style="background:#F5F1E8; color:#13141C; font-family:'DM Sans', Arial, sans-serif; padding:128px; display:flex; flex-direction:column; gap:48px">
-<h2 style="font-family:'Fraunces', Georgia, serif; font-size:72px; font-weight:400; line-height:1.1">Three domains, nine objectives</h2>
-<div style="display:flex; gap:32px">
-<div style="flex:1; display:flex; flex-direction:column; background:#FBF9F4; border:1px solid #E2DCCD; border-radius:24px; overflow:hidden">
-<div style="background:#2E7D6F; padding:24px 32px"><h3 style="font-family:'Fraunces', Georgia, serif; font-size:44px; font-weight:500; color:#F5F1E8">Health</h3></div>
-<div style="padding:24px 32px; display:flex; flex-direction:column; gap:4px; border-bottom:1px solid #E2DCCD"><p style="font-size:30px; font-weight:700">Mind</p><p style="font-size:24px; line-height:1.4; color:#4A4D5A">Clarity, learning, calm focus</p></div>
-<div style="padding:24px 32px; display:flex; flex-direction:column; gap:4px; border-bottom:1px solid #E2DCCD"><p style="font-size:30px; font-weight:700">Body</p><p style="font-size:24px; line-height:1.4; color:#4A4D5A">Strength, energy, sleep, food</p></div>
-<div style="padding:24px 32px; display:flex; flex-direction:column; gap:4px"><p style="font-size:30px; font-weight:700">Spirit</p><p style="font-size:24px; line-height:1.4; color:#4A4D5A">Meaning, gratitude, stillness</p></div>
-</div>
-<div style="flex:1; display:flex; flex-direction:column; background:#FBF9F4; border:1px solid #E2DCCD; border-radius:24px; overflow:hidden">
-<div style="background:#3B5BA9; padding:24px 32px"><h3 style="font-family:'Fraunces', Georgia, serif; font-size:44px; font-weight:500; color:#F5F1E8">Work</h3></div>
-<div style="padding:24px 32px; display:flex; flex-direction:column; gap:4px; border-bottom:1px solid #E2DCCD"><p style="font-size:30px; font-weight:700">Wealth</p><p style="font-size:24px; line-height:1.4; color:#4A4D5A">Income, savings, investments</p></div>
-<div style="padding:24px 32px; display:flex; flex-direction:column; gap:4px; border-bottom:1px solid #E2DCCD"><p style="font-size:30px; font-weight:700">Impact</p><p style="font-size:24px; line-height:1.4; color:#4A4D5A">Work that matters to others</p></div>
-<div style="padding:24px 32px; display:flex; flex-direction:column; gap:4px"><p style="font-size:30px; font-weight:700">Growth</p><p style="font-size:24px; line-height:1.4; color:#4A4D5A">Skills, craft, career leverage</p></div>
-</div>
-<div style="flex:1; display:flex; flex-direction:column; background:#FBF9F4; border:1px solid #E2DCCD; border-radius:24px; overflow:hidden">
-<div style="background:#B8563D; padding:24px 32px"><h3 style="font-family:'Fraunces', Georgia, serif; font-size:44px; font-weight:500; color:#F5F1E8">Relationships</h3></div>
-<div style="padding:24px 32px; display:flex; flex-direction:column; gap:4px; border-bottom:1px solid #E2DCCD"><p style="font-size:30px; font-weight:700">Family</p><p style="font-size:24px; line-height:1.4; color:#4A4D5A">Presence with the closest people</p></div>
-<div style="padding:24px 32px; display:flex; flex-direction:column; gap:4px; border-bottom:1px solid #E2DCCD"><p style="font-size:30px; font-weight:700">Romance</p><p style="font-size:24px; line-height:1.4; color:#4A4D5A">Partnership, intimacy, fun</p></div>
-<div style="padding:24px 32px; display:flex; flex-direction:column; gap:4px"><p style="font-size:30px; font-weight:700">Social &amp; community</p><p style="font-size:24px; line-height:1.4; color:#4A4D5A">Friends, network, giving back</p></div>
-</div>
-</div>
+    <div class="abs card lv lv3" style="left:312px; top:640px; width:400px; height:280px; background:var(--mind-soft); color:var(--ink)">
+      <p class="tag" style="color:#3B5BA9">Still</p><p class="num">10 min</p><p class="lbl">meditation every morning</p>
+    </div>
+    <div class="abs card lv lv3" style="left:760px; top:640px; width:400px; height:280px; background:var(--mind-soft); color:var(--ink)">
+      <p class="tag" style="color:#3B5BA9">Calm</p><p class="num">1 breath</p><p class="lbl">before I react</p>
+    </div>
+    <div class="abs card lv lv3" style="left:1208px; top:640px; width:400px; height:280px; background:var(--mind-soft); color:var(--ink)">
+      <p class="tag" style="color:#3B5BA9">Grateful</p><p class="num">3 things</p><p class="lbl">written down each night</p>
+    </div>
+  </section>
 
-</section>
-
-<section id="wig" data-transition="fade" style="background:#13141C; color:#F5F1E8; font-family:'DM Sans', Arial, sans-serif; padding:128px; display:flex; flex-direction:column; gap:48px">
-<div style="display:flex; flex-direction:column; gap:16px">
-<h2 style="font-family:'Fraunces', Georgia, serif; font-size:72px; font-weight:400; line-height:1.1">Then pick the WIG</h2>
-<p style="font-size:28px; color:#B9BCC8">Wildly Important Goal: 4DX's name for the “MIO”, the one objective that changes everything else.</p>
-</div>
-<div style="display:flex; align-items:center; gap:24px">
-<div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#1C1E29; padding:40px; border-radius:24px">
-<p style="font-family:'Fraunces', Georgia, serif; font-size:120px; line-height:1; color:#B9BCC8">9</p>
-<p style="font-size:28px; font-weight:700">Objectives</p>
-<p style="font-size:24px; line-height:1.4; color:#B9BCC8">The whole map: good ideas, all of them</p>
-</div>
-<svg width="56" height="28" viewBox="0 0 64 32" style="flex:none"><path d="M0 10h38V0l26 16-26 16V22H0z" fill="#E3B04B"/></svg>
-<div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#1C1E29; padding:40px; border-radius:24px">
-<p style="font-family:'Fraunces', Georgia, serif; font-size:120px; line-height:1; color:#F5F1E8">3</p>
-<p style="font-size:28px; font-weight:700">WIGs</p>
-<p style="font-size:24px; line-height:1.4; color:#B9BCC8">One per domain: health, work, relationships</p>
-</div>
-<svg width="56" height="28" viewBox="0 0 64 32" style="flex:none"><path d="M0 10h38V0l26 16-26 16V22H0z" fill="#E3B04B"/></svg>
-<div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#E3B04B; padding:40px; border-radius:24px">
-<p style="font-family:'Fraunces', Georgia, serif; font-size:120px; line-height:1; color:#13141C">1</p>
-<p style="font-size:28px; font-weight:700; color:#13141C">Lead WIG</p>
-<p style="font-size:24px; line-height:1.4; color:#3A2E12">First claim on your best hours when life gets loud</p>
-</div>
-</div>
-<div style="display:flex; align-items:center; gap:48px; border-top:1px solid #333645; padding:40px 0 0 0">
-<p style="font-family:'Fraunces', Georgia, serif; font-style:italic; font-size:44px; color:#E3B04B; white-space:nowrap">From X to Y by When</p>
-<p style="font-size:28px; line-height:1.45; color:#B9BCC8">Every WIG is written this way. Example: <b style="color:#F5F1E8">Body, from [__] kg to [__] kg by the end of week 12.</b></p>
-</div>
-
-</section>
-
-<section id="disciplines" data-transition="fade" style="background:#F5F1E8; color:#13141C; font-family:'DM Sans', Arial, sans-serif; padding:128px; display:flex; flex-direction:column; gap:40px">
-<h2 style="font-family:'Fraunces', Georgia, serif; font-size:72px; font-weight:400; line-height:1.1">The four disciplines, installed</h2>
-<div style="display:flex; flex-direction:column; gap:16px">
-<div style="display:grid; grid-template-columns:120px 560px 1fr; align-items:center; gap:32px; background:#FBF9F4; border:1px solid #E2DCCD; border-radius:20px; padding:24px 40px">
-<p style="font-family:'Fraunces', Georgia, serif; font-size:72px; line-height:1; color:#8A6516">1</p>
-<p style="font-size:32px; font-weight:700; line-height:1.25">Focus on the wildly important</p>
-<p style="font-size:26px; line-height:1.4; color:#4A4D5A">One WIG per domain, written as “From X to Y by When”.</p>
-</div>
-<div style="display:grid; grid-template-columns:120px 560px 1fr; align-items:center; gap:32px; background:#FBF9F4; border:1px solid #E2DCCD; border-radius:20px; padding:24px 40px">
-<p style="font-family:'Fraunces', Georgia, serif; font-size:72px; line-height:1; color:#8A6516">2</p>
-<p style="font-size:32px; font-weight:700; line-height:1.25">Act on the lead measures</p>
-<p style="font-size:26px; line-height:1.4; color:#4A4D5A">The daily actions: things I control that predict the WIG.</p>
-</div>
-<div style="display:grid; grid-template-columns:120px 560px 1fr; align-items:center; gap:32px; background:#FBF9F4; border:1px solid #E2DCCD; border-radius:20px; padding:24px 40px">
-<p style="font-family:'Fraunces', Georgia, serif; font-size:72px; line-height:1; color:#8A6516">3</p>
-<p style="font-size:32px; font-weight:700; line-height:1.25">Keep a compelling scoreboard</p>
-<p style="font-size:26px; line-height:1.4; color:#4A4D5A">The 84-dot rim: in five seconds I can see if I'm winning.</p>
-</div>
-<div style="display:grid; grid-template-columns:120px 560px 1fr; align-items:center; gap:32px; background:#FBF9F4; border:1px solid #E2DCCD; border-radius:20px; padding:24px 40px">
-<p style="font-family:'Fraunces', Georgia, serif; font-size:72px; line-height:1; color:#8A6516">4</p>
-<p style="font-size:32px; font-weight:700; line-height:1.25">Create a cadence of accountability</p>
-<p style="font-size:26px; line-height:1.4; color:#4A4D5A">A 30-minute weekly review: report, check the score, commit.</p>
-</div>
-</div>
-
-</section>
-
-<section id="health" data-transition="fade" style="background:#F5F1E8; color:#13141C; font-family:'DM Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:24px">
-<div style="position:absolute; left:170px; top:300px; width:520px; height:520px; background:#DCEBE7; border:3px solid #2E7D6F; border-radius:50%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; padding:72px">
-<p style="font-size:24px; font-weight:700; letter-spacing:3px; color:#1F4F47">HEALTH · MIND</p>
-<h3 style="font-family:'Fraunces', Georgia, serif; font-size:44px; font-weight:500; text-align:center">Clear mind</h3>
-<p style="font-size:26px; line-height:1.35; text-align:center; color:#13141C"><b>WIG:</b> from [__] to [__] books finished by week 12</p>
-<p style="font-size:24px; line-height:1.4; text-align:center; color:#1F4F47">Daily: 20 pages · 10 min meditation</p>
-</div>
-<div style="position:absolute; left:700px; top:300px; width:520px; height:520px; background:#DCEBE7; border:3px solid #2E7D6F; border-radius:50%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; padding:72px">
-<p style="font-size:24px; font-weight:700; letter-spacing:3px; color:#1F4F47">HEALTH · BODY</p>
-<h3 style="font-family:'Fraunces', Georgia, serif; font-size:44px; font-weight:500; text-align:center">Strong body</h3>
-<p style="font-size:26px; line-height:1.35; text-align:center; color:#13141C"><b>WIG:</b> from [__] kg to [__] kg by week 12</p>
-<p style="font-size:24px; line-height:1.4; text-align:center; color:#1F4F47">Daily: train 45 min · 8k steps · 7.5 h sleep</p>
-</div>
-<div style="position:absolute; left:1230px; top:300px; width:520px; height:520px; background:#DCEBE7; border:3px solid #2E7D6F; border-radius:50%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; padding:72px">
-<p style="font-size:24px; font-weight:700; letter-spacing:3px; color:#1F4F47">HEALTH · SPIRIT</p>
-<h3 style="font-family:'Fraunces', Georgia, serif; font-size:44px; font-weight:500; text-align:center">Grounded spirit</h3>
-<p style="font-size:26px; line-height:1.35; text-align:center; color:#13141C"><b>WIG:</b> from [__] to [__] days journaled by week 12</p>
-<p style="font-size:24px; line-height:1.4; text-align:center; color:#1F4F47">Daily: 5-min gratitude · 10 min outside</p>
-</div>
-<h2 style="font-family:'Fraunces', Georgia, serif; font-size:72px; font-weight:400; line-height:1.1">Health: the first 12-week plan</h2>
-<p style="font-size:28px; color:#4A4D5A">Three bubbles, each with one measurable goal and the daily actions that drive it.</p>
-<p style="position:absolute; left:128px; bottom:64px; width:1664px; font-size:24px; color:#4A4D5A">Draft targets in [brackets]. Repeat this page for Work and for Relationships.</p>
-
-</section>
-
-<section id="twelve-weeks" data-transition="fade" style="background:#13141C; color:#F5F1E8; font-family:'DM Sans', Arial, sans-serif; padding:128px; display:flex; flex-direction:column; gap:48px">
-<h2 style="font-family:'Fraunces', Georgia, serif; font-size:72px; font-weight:400; line-height:1.1">Twelve weeks, three stages</h2>
-<div style="display:grid; grid-template-columns:repeat(12, 1fr); gap:12px">
-<div style="grid-column:span 4; display:flex; flex-direction:column; gap:12px; background:#1C1E29; border-top:6px solid #8A6516; padding:32px; border-radius:16px">
-<p style="font-size:24px; font-weight:700; letter-spacing:3px; color:#E3B04B">WEEKS 1–4</p>
-<h3 style="font-family:'Fraunces', Georgia, serif; font-size:44px; font-weight:500">Foundation</h3>
-<p style="font-size:26px; line-height:1.4; color:#B9BCC8">Install the habits. Make them easy, even tiny.</p>
-</div>
-<div style="grid-column:span 4; display:flex; flex-direction:column; gap:12px; background:#1C1E29; border-top:6px solid #C08E2C; padding:32px; border-radius:16px">
-<p style="font-size:24px; font-weight:700; letter-spacing:3px; color:#E3B04B">WEEKS 5–8</p>
-<h3 style="font-family:'Fraunces', Georgia, serif; font-size:44px; font-weight:500">Build</h3>
-<p style="font-size:26px; line-height:1.4; color:#B9BCC8">Raise the bar on each lead measure.</p>
-</div>
-<div style="grid-column:span 4; display:flex; flex-direction:column; gap:12px; background:#1C1E29; border-top:6px solid #E3B04B; padding:32px; border-radius:16px">
-<p style="font-size:24px; font-weight:700; letter-spacing:3px; color:#E3B04B">WEEKS 9–12</p>
-<h3 style="font-family:'Fraunces', Georgia, serif; font-size:44px; font-weight:500">Peak</h3>
-<p style="font-size:26px; line-height:1.4; color:#B9BCC8">Push each WIG over the line, then review.</p>
-</div>
-<p style="background:#3A2E12; color:#F5F1E8; font-size:24px; font-weight:700; text-align:center; padding:16px 0; border-radius:12px">W1</p>
-<p style="background:#3A2E12; color:#F5F1E8; font-size:24px; font-weight:700; text-align:center; padding:16px 0; border-radius:12px">W2</p>
-<p style="background:#3A2E12; color:#F5F1E8; font-size:24px; font-weight:700; text-align:center; padding:16px 0; border-radius:12px">W3</p>
-<p style="background:#3A2E12; color:#F5F1E8; font-size:24px; font-weight:700; text-align:center; padding:16px 0; border-radius:12px">W4</p>
-<p style="background:#6B5020; color:#F5F1E8; font-size:24px; font-weight:700; text-align:center; padding:16px 0; border-radius:12px">W5</p>
-<p style="background:#6B5020; color:#F5F1E8; font-size:24px; font-weight:700; text-align:center; padding:16px 0; border-radius:12px">W6</p>
-<p style="background:#6B5020; color:#F5F1E8; font-size:24px; font-weight:700; text-align:center; padding:16px 0; border-radius:12px">W7</p>
-<p style="background:#6B5020; color:#F5F1E8; font-size:24px; font-weight:700; text-align:center; padding:16px 0; border-radius:12px">W8</p>
-<p style="background:#E3B04B; color:#13141C; font-size:24px; font-weight:700; text-align:center; padding:16px 0; border-radius:12px">W9</p>
-<p style="background:#E3B04B; color:#13141C; font-size:24px; font-weight:700; text-align:center; padding:16px 0; border-radius:12px">W10</p>
-<p style="background:#E3B04B; color:#13141C; font-size:24px; font-weight:700; text-align:center; padding:16px 0; border-radius:12px">W11</p>
-<p style="background:#E3B04B; color:#13141C; font-size:24px; font-weight:700; text-align:center; padding:16px 0; border-radius:12px">W12</p>
-</div>
-<div style="flex:1"></div>
-<div style="display:flex; align-items:center; gap:24px; border-top:1px solid #333645; padding:32px 0 0 0">
-<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#E3B04B" stroke-width="2" stroke-linecap="round" style="flex:none"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-<p style="font-size:28px; line-height:1.45; color:#B9BCC8"><b style="color:#F5F1E8">Every [Sunday]:</b> 30-minute review. What did I commit to? What does the scoreboard say? What's next week's one commitment per WIG?</p>
-</div>
-
-</section>
-
-<section id="daily" data-transition="fade" style="background:#EBE5D8; color:#13141C; font-family:'DM Sans', Arial, sans-serif; padding:128px; display:flex; flex-direction:column; gap:40px">
-<h2 style="font-family:'Fraunces', Georgia, serif; font-size:72px; font-weight:400; line-height:1.1">A day in the Life OS</h2>
-<div style="display:flex; gap:24px">
-<div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#13141C; color:#F5F1E8; padding:32px 40px; border-radius:20px">
-<p style="font-size:24px; font-weight:700; letter-spacing:3px; color:#E3B04B">MORNING</p>
-<p style="font-size:28px; line-height:1.4">Read the identity sentence. Glance at the scoreboard.</p>
-</div>
-<div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#13141C; color:#F5F1E8; padding:32px 40px; border-radius:20px">
-<p style="font-size:24px; font-weight:700; letter-spacing:3px; color:#E3B04B">DAY</p>
-<p style="font-size:28px; line-height:1.4">Hit the lead measures: at least one per domain.</p>
-</div>
-<div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#13141C; color:#F5F1E8; padding:32px 40px; border-radius:20px">
-<p style="font-size:24px; font-weight:700; letter-spacing:3px; color:#E3B04B">EVENING</p>
-<p style="font-size:28px; line-height:1.4">Fill in today's dot. Did I vote for who I am?</p>
-</div>
-</div>
-<p style="font-size:28px; font-weight:700; color:#4A4D5A">Clear's four laws keep each action alive:</p>
-<div style="display:flex; gap:24px">
-<div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FBF9F4; border:1px solid #D6CEBC; padding:32px; border-radius:20px">
-<h3 style="font-size:32px; font-weight:700">Obvious</h3>
-<p style="font-size:24px; line-height:1.4; color:#4A4D5A">Gym bag packed by the door</p>
-</div>
-<div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FBF9F4; border:1px solid #D6CEBC; padding:32px; border-radius:20px">
-<h3 style="font-size:32px; font-weight:700">Attractive</h3>
-<p style="font-size:24px; line-height:1.4; color:#4A4D5A">Favourite podcast only on walks</p>
-</div>
-<div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FBF9F4; border:1px solid #D6CEBC; padding:32px; border-radius:20px">
-<h3 style="font-size:32px; font-weight:700">Easy</h3>
-<p style="font-size:24px; line-height:1.4; color:#4A4D5A">A two-minute version for bad days</p>
-</div>
-<div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FBF9F4; border:1px solid #D6CEBC; padding:32px; border-radius:20px">
-<h3 style="font-size:32px; font-weight:700">Satisfying</h3>
-<p style="font-size:24px; line-height:1.4; color:#4A4D5A">Fill the dot. Never miss twice.</p>
-</div>
-</div>
-
-</section>
-
-<section id="start" data-transition="fade" style="background:#13141C; color:#F5F1E8; font-family:'DM Sans', Arial, sans-serif; padding:128px; display:grid; grid-template-columns:640px 1fr; gap:96px; align-items:center">
-<div style="display:flex; flex-direction:column; gap:24px">
-<p style="font-size:24px; font-weight:700; letter-spacing:4px; color:#E3B04B">NEXT</p>
-<h2 style="font-family:'Fraunces', Georgia, serif; font-size:96px; font-weight:400; line-height:1.1">Start this week</h2>
-<p style="font-family:'Fraunces', Georgia, serif; font-style:italic; font-size:44px; line-height:1.3; color:#E3B04B">Week 1 begins [date].</p>
-</div>
-<ol style="font-size:32px; line-height:1.5; color:#F5F1E8; display:flex; flex-direction:column; gap:20px">
-<li>Finalize the identity sentence; read it every morning.</li>
-<li>Draft all nine objectives, one per bubble.</li>
-<li>Circle one WIG per domain and name the lead WIG.</li>
-<li>Write each as “From X to Y by When”.</li>
-<li>Pick one or two lead measures per WIG.</li>
-<li>Print the 84-dot scoreboard.</li>
-<li>Book the weekly review: [day, time].</li>
-</ol>
-
-</section>
+  <!-- 5 · Why it works -->
+  <section class="slide" style="background:var(--gold); color:var(--ink)">
+    <p class="abs eyebrow" style="left:160px; top:200px">Why it works</p>
+    <h1 class="abs serif lv lv1" style="left:160px; top:270px; width:1600px; font-size:96px; font-weight:400; line-height:1.15">Every workout, every meal, every breath is a vote for <i>“I am phenomenal.”</i></h1>
+    <div class="abs lv lv2" style="left:160px; top:720px; display:flex; gap:28px; align-items:center; font-size:36px; font-weight:700">
+      <span>Who I am</span><span style="opacity:.5">→</span><span>What I believe</span><span style="opacity:.5">→</span><span>What I do</span>
+    </div>
+    <p class="abs lv lv3" style="left:160px; top:800px; font-size:28px; color:var(--gold-deep)">Idea from James Clear, <i>Atomic Habits</i>: identity first, then habits.</p>
+  </section>
 
 </div>
-<div id="bar"><button id="prev" aria-label="Previous slide">←</button><span id="count"></span><button id="next" aria-label="Next slide">→</button><button id="fs">Fullscreen</button></div>
+
+<div id="bar">
+  <button id="prev" aria-label="Previous slide">←</button><span id="count"></span>
+  <button id="next" aria-label="Next slide">→</button><button id="fs">Fullscreen</button>
+</div>
+
 <script>
-const slides=[...document.querySelectorAll('#stage>section')],stage=document.getElementById('stage'),count=document.getElementById('count');
-let i=Math.max(0,Math.min(slides.length-1,(parseInt(location.hash.slice(1))||1)-1));
-function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);stage.style.transform='translate(-50%,-50%) scale('+s+')'}
-function show(n){i=Math.max(0,Math.min(slides.length-1,n));slides.forEach((s,k)=>s.classList.toggle('on',k===i));count.textContent=(i+1)+' / '+slides.length;history.replaceState(null,'','#'+(i+1))}
-addEventListener('resize',fit);
-addEventListener('keydown',e=>{if(['ArrowRight','ArrowDown','PageDown',' ','Enter'].includes(e.key)){e.preventDefault();show(i+1)}else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(e.key)){e.preventDefault();show(i-1)}else if(e.key==='Home')show(0);else if(e.key==='End')show(slides.length-1);else if(e.key==='f')toggleFs()});
-stage.addEventListener('click',e=>{show(e.clientX>innerWidth/2?i+1:i-1)});
-let tx=null;addEventListener('touchstart',e=>tx=e.touches[0].clientX,{passive:true});addEventListener('touchend',e=>{if(tx===null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>40)show(dx<0?i+1:i-1);tx=null});
-function toggleFs(){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen()}
-document.getElementById('prev').onclick=()=>show(i-1);document.getElementById('next').onclick=()=>show(i+1);document.getElementById('fs').onclick=toggleFs;
-fit();show(i);
-</script></body></html>
+  const slides = [...document.querySelectorAll('.slide')];
+  const stage = document.getElementById('stage');
+  const count = document.getElementById('count');
+  let i = Math.max(0, Math.min(slides.length - 1, (parseInt(location.hash.slice(1)) || 1) - 1));
+
+  function fit() {
+    const s = Math.min(innerWidth / 1920, innerHeight / 1080);
+    stage.style.transform = 'translate(-50%, -50%) scale(' + s + ')';
+  }
+  function show(n) {
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach((s, k) => s.classList.toggle('on', k === i));
+    count.textContent = (i + 1) + ' / ' + slides.length;
+    history.replaceState(null, '', '#' + (i + 1));
+  }
+  function toggleFs() {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+  }
+
+  addEventListener('resize', fit);
+  addEventListener('keydown', e => {
+    if (['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); show(i + 1); }
+    else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].includes(e.key)) { e.preventDefault(); show(i - 1); }
+    else if (e.key === 'Home') show(0);
+    else if (e.key === 'End') show(slides.length - 1);
+    else if (e.key === 'f') toggleFs();
+  });
+  stage.addEventListener('click', e => show(e.clientX > innerWidth / 2 ? i + 1 : i - 1));
+  let tx = null;
+  addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+  addEventListener('touchend', e => {
+    if (tx === null) return;
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 40) show(dx < 0 ? i + 1 : i - 1);
+    tx = null;
+  });
+  document.getElementById('prev').onclick = () => show(i - 1);
+  document.getElementById('next').onclick = () => show(i + 1);
+  document.getElementById('fs').onclick = toggleFs;
+  fit(); show(i);
+</script>
+</body>
+</html>
